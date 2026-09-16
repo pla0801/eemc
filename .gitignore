@@ -1,0 +1,16 @@
+# Local secrets
+.env
+
+# Python caches
+__pycache__/
+
+# Datasets
+/data/
+
+# Downloaded model weights/checkpoints
+# Keep helper scripts directly under weights/, e.g. weights/download_*.py.
+/weights/*
+!/weights/*.py
+
+# Experiment outputs
+/results/
