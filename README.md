@@ -1,14 +1,14 @@
-# EEMF
+# EEMC
 
 Entropy-Energy-Driven Multi-Cache Framework for robust zero-shot point cloud recognition.
 
-![EEMF Architecture](assets/architecture.png)
+![EEMC Architecture](assets/architecture.png)
 
 ## Overview
 
-Recent 3D Vision-Language Foundation Models (3D VLFMs) have advanced open-vocabulary point cloud recognition, but their zero-shot recognition performance can still degrade substantially under distribution shifts. EEMF is a training-free point cloud test-time adaptation framework that integrates distribution constraints into online cache construction and inference.
+Recent 3D Vision-Language Foundation Models (3D VLFMs) have advanced open-vocabulary point cloud recognition, but their zero-shot recognition performance can still degrade substantially under distribution shifts. EEMC is a training-free point cloud test-time adaptation framework that integrates distribution constraints into online cache construction and inference.
 
-EEMF keeps the 3D VLFM backbone frozen. During test-time inference, it selects reliable prototypes with prediction entropy and energy, maintains complementary positive and negative caches, constrains local-cache updates with textual and visual distributions, and fuses cache predictions with zero-shot predictions for final inference. The method does not require source data, target labels, backpropagation, or model parameter updates.
+EEMC keeps the 3D VLFM backbone frozen. During test-time inference, it selects reliable prototypes with prediction entropy and energy, maintains complementary positive and negative caches, constrains local-cache updates with textual and visual distributions, and fuses cache predictions with zero-shot predictions for final inference. The method does not require source data, target labels, backpropagation, or model parameter updates.
 
 The current release supports four 3D VLFM backbones:
 
@@ -26,7 +26,7 @@ The current release evaluates four datasets:
 
 ## Method at a Glance
 
-EEMF contains four online caches:
+EEMC contains four online caches:
 
 | Cache | Capacity | Role |
 | --- | ---: | --- |
@@ -54,30 +54,30 @@ Recommended workflow:
 
 ~~~bash
 conda env create -f environment.yml
-conda activate eemf
+conda activate EEMC
 
 # Prepare datasets under data/.
 # Prepare pre-trained backbone weights under weights/.
 
-bash scripts/run_eemf_all.sh 0
+bash scripts/run_EEMC_all.sh 0
 ~~~
 
 Here 0 is the physical GPU index. The released scripts use relative paths and write outputs to <code>results/</code>.
 
 ### 1. Environment
 
-The recommended environment name is <code>eemf</code>:
+The recommended environment name is <code>EEMC</code>:
 
 ~~~bash
 conda env create -f environment.yml
-conda activate eemf
+conda activate EEMC
 ~~~
 
 If you already have a compatible Conda environment, you can install the pip package list manually:
 
 ~~~bash
-conda create -n eemf python=3.9 -y
-conda activate eemf
+conda create -n EEMC python=3.9 -y
+conda activate EEMC
 pip install -r requirements.txt
 ~~~
 
@@ -92,7 +92,7 @@ Main runtime versions used by the released experiments include:
 
 ### 2. Datasets
 
-EEMF uses ModelNet, ModelNet-C, ScanObjectNN, and ScanObjectNN-C. The clean splits are stored together with their corrupted counterparts:
+EEMC uses ModelNet, ModelNet-C, ScanObjectNN, and ScanObjectNN-C. The clean splits are stored together with their corrupted counterparts:
 
 - ModelNet: <code>data/modelnet_c/clean.h5</code>
 - ScanObjectNN: <code>data/sonn_c/hardest/clean.h5</code>
@@ -107,7 +107,7 @@ Download the datasets from the official benchmark repositories and place them un
 The expected dataset layout is:
 
 ~~~text
-EEMF/
+EEMC/
   data/
     modelnet_c/
       shape_names.txt
@@ -165,7 +165,7 @@ ULIP and ULIP-2 weights should be downloaded from the official link above and pl
 
 ### 4. Text Prompts and Optional LLM Configuration
 
-The default EEMF setting uses handcrafted prompts for zero-shot inference and cached LLM-enhanced class descriptions for textual distribution modeling. The cached prompt files are expected under <code>llm/</code>:
+The default EEMC setting uses handcrafted prompts for zero-shot inference and cached LLM-enhanced class descriptions for textual distribution modeling. The cached prompt files are expected under <code>llm/</code>:
 
 ~~~text
 llm/
@@ -185,14 +185,14 @@ LLM_API_BASE_URL=https://api.deepseek.com/chat/completions
 LLM_TEMPERATURE=0.3
 ~~~
 
-Then run <code>python -m eemf.run</code> with <code>--force-regenerate-prompts</code> or a custom prompt-cache setting. The code loads <code>.env</code> through <code>python-dotenv</code>.
+Then run <code>python -m EEMC.run</code> with <code>--force-regenerate-prompts</code> or a custom prompt-cache setting. The code loads <code>.env</code> through <code>python-dotenv</code>.
 
-### 5. Running EEMF
+### 5. Running EEMC
 
 Run one backbone on one dataset:
 
 ~~~bash
-bash scripts/run_eemf.sh BACKBONE DATASET [GPU] [SEVERITY]
+bash scripts/run_EEMC.sh BACKBONE DATASET [GPU] [SEVERITY]
 ~~~
 
 Arguments:
@@ -201,26 +201,26 @@ Arguments:
 | --- | --- | --- |
 | <code>BACKBONE</code> | <code>ulip</code>, <code>ulip2</code>, <code>openshape</code>, <code>uni3d</code> | 3D VLFM backbone. |
 | <code>DATASET</code> | <code>modelnet</code>, <code>scanobjnn</code>, <code>modelnet_c</code>, <code>scanobjnn_c</code> | Evaluation dataset. |
-| <code>GPU</code> | integer GPU id | Physical GPU index. Defaults to 0 or <code>EEMF_GPU</code>. |
+| <code>GPU</code> | integer GPU id | Physical GPU index. Defaults to 0 or <code>EEMC_GPU</code>. |
 | <code>SEVERITY</code> | <code>0</code>, <code>1</code>, <code>2</code>, <code>3</code>, <code>4</code>, <code>all</code> | Optional; only valid for corrupted datasets. |
 
 Examples:
 
 ~~~bash
 # Clean ModelNet with ULIP.
-bash scripts/run_eemf.sh ulip modelnet 0
+bash scripts/run_EEMC.sh ulip modelnet 0
 
 # Clean ScanObjectNN hardest split with OpenShape.
-bash scripts/run_eemf.sh openshape scanobjnn 0
+bash scripts/run_EEMC.sh openshape scanobjnn 0
 
 # ModelNet-C full all35 evaluation with ULIP-2.
-bash scripts/run_eemf.sh ulip2 modelnet_c 0
+bash scripts/run_EEMC.sh ulip2 modelnet_c 0
 
 # ScanObjectNN-C full all35 evaluation with Uni3D.
-bash scripts/run_eemf.sh uni3d scanobjnn_c 0 all
+bash scripts/run_EEMC.sh uni3d scanobjnn_c 0 all
 
 # ModelNet-C severity level 2 only: all seven corruption families at level 2.
-bash scripts/run_eemf.sh ulip modelnet_c 0 2
+bash scripts/run_EEMC.sh ulip modelnet_c 0 2
 ~~~
 
 For corrupted datasets, omitting <code>SEVERITY</code> or passing <code>all</code> runs all 35 streams. Passing a severity level runs all seven corruption families at that level. The released entry does not take an individual corruption name as an argument.
@@ -228,20 +228,20 @@ For corrupted datasets, omitting <code>SEVERITY</code> or passing <code>all</cod
 Run multiple backbones and datasets:
 
 ~~~bash
-bash scripts/run_eemf_all.sh [GPU] [BACKBONES] [DATASETS]
+bash scripts/run_EEMC_all.sh [GPU] [BACKBONES] [DATASETS]
 ~~~
 
 Examples:
 
 ~~~bash
 # Run all four backbones on all four datasets.
-bash scripts/run_eemf_all.sh 0
+bash scripts/run_EEMC_all.sh 0
 
 # Run ULIP and ULIP-2 on ModelNet-C and ScanObjectNN-C.
-bash scripts/run_eemf_all.sh 0 ulip,ulip2 modelnet_c,scanobjnn_c
+bash scripts/run_EEMC_all.sh 0 ulip,ulip2 modelnet_c,scanobjnn_c
 
 # Use the GPU id from an environment variable.
-EEMF_GPU=1 bash scripts/run_eemf_all.sh
+EEMC_GPU=1 bash scripts/run_EEMC_all.sh
 ~~~
 
 The batch script runs each selected backbone-dataset pair sequentially. Corrupted datasets use the full all35 protocol by default.
@@ -282,7 +282,7 @@ No aggregate rows are written. For the all35 protocol, the CSV stores the 35 con
 Check the command-line interface:
 
 ~~~bash
-python -m eemf.run --help
+python -m EEMC.run --help
 ~~~
 
 Run the lightweight release tests:
